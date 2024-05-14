@@ -7,25 +7,69 @@ from flask import current_app
 
 # internal imports
 from codeapp import db
-from codeapp.models import Dummy
+from codeapp.models import our_class
+
+import csv
+import requests
+import redis
+from typing import List
 
 
-def get_data_list() -> list[Dummy]:
-    """
-    Function responsible for downloading the dataset from the source, translating it
-    into a list of Python objects, and saving it to a Redis list.
-    """
-    # TODO
-    pass
+def get_data_list() -> List[our_class]:
+    url = "https://onu1.s2.chalmers.se/datasets/Europe_Sales_Records.csv"
+    response = requests.get(url)
+    data = response.text.split("\n")
+
+    reader = csv.reader(data)
+    headers = next(reader)
+    data_list = [our_class(*row) for row in reader if len(row) == 9]
+
+    r = redis.Redis(
+        host="onu1.s2.chalmers.se",
+        port=6380,
+        db=92,
+        password="a62b9a30-24a4-4153-a2a1-42d577161676pip",
+    )
+    for item in data_list:
+        r.lpush("mylist", item)
+
+    return data_list
 
 
-def calculate_statistics(dataset: list[Dummy]) -> dict[int | str, int]:
+"""
+Function responsible for downloading the dataset from the source, translating it
+into a list of Python objects, and saving it to a Redis list.
+"""
+# TODO
+pass
+
+from collections import Counter
+from statistics import mean
+
+
+def calculate_statistics(dataset: list[our_class]) -> dict[int | str, int]:
     """
     Receives the dataset in the form of a list of Python objects, and calculates the
     statistics necessary.
     """
-    # TODO
-    pass
+    # calculate the total units  sold
+    total_units_sold = sum(item.units_sold for item in dataset)
+    # here we calculate the average profit
+    average_profit = mean(item.total_profit for item in dataset)
+    # calculate the most common country
+    country_frequency = Counter(item.country for item in dataset)
+    most_common_country = country_frequency.most_common(1)[0]
+
+    return {
+        "total_units_sold": total_units_sold,
+        "average_profit": average_profit,
+        "most_common_country": most_common_country,
+        "most_common_item_type": most_common_item_type,
+    }
+
+
+# TODO
+pass
 
 
 def prepare_figure(input_figure: str) -> str:

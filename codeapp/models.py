@@ -4,13 +4,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
-class:
 
-order_id: int
-country
-item_type
-order_priority
-order_date: date
-ship_date: date
-units_sold: int
-profit: float
+@dataclass
+class our_class:
+    country: str
+    item_type: str
+    sales_channel: str
+    order_priority: str
+    order_date: datetime
+    order_id: int
+    ship_date: datetime
+    units_sold: int
+    total_profit: float
