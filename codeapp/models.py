@@ -4,6 +4,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 
+class:
 
-class Dummy:  # TODO: this class is to be removed
-    pass
+order_id: int
+country
+item_type
+order_priority
+order_date: date
+ship_date: date
+units_sold: int
+profit: float
