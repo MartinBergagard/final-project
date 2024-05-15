@@ -56,14 +56,14 @@ def calculate_statistics(dataset: list) -> dict:
     # Calculate the number of orders per transit day between 10 to 30
     transit_days_counter = Counter(
         (
-            datetime.strptime(item["ship_date"], "%m/%d/%Y")
-            - datetime.strptime(item["order_date"], "%m/%d/%Y")
+            datetime.strptime(item.ship_date, "%m/%d/%Y")
+            - datetime.strptime(item.order_date, "%m/%d/%Y")
         ).days
         for item in dataset
         if 10
         <= (
-            datetime.strptime(item["ship_date"], "%m/%d/%Y")
-            - datetime.strptime(item["order_date"], "%m/%d/%Y")
+            datetime.strptime(item.ship_date, "%m/%d/%Y")
+            - datetime.strptime(item.order_date, "%m/%d/%Y")
         ).days
         <= 30
     )
