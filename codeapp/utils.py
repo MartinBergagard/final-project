@@ -28,10 +28,13 @@ def get_data_list() -> List[our_class]:
         host="onu1.s2.chalmers.se",
         port=6380,
         db=92,
-        password="a62b9a30-24a4-4153-a2a1-42d577161676pip",
+        password="a62b9a30-24a4-4153-a2a1-42d577161676",
     )
     for item in data_list:
-        r.lpush("mylist", item)
+        # Serialize the object
+        serialized_item = pickle.dumps(item)
+        # Store the serialized object in Redis
+        r.lpush("dataset_list", serialized_item)
 
     return data_list
 
@@ -40,36 +43,34 @@ def get_data_list() -> List[our_class]:
 Function responsible for downloading the dataset from the source, translating it
 into a list of Python objects, and saving it to a Redis list.
 """
-# TODO
-pass
 
 from collections import Counter
-from statistics import mean
+from datetime import datetime
 
 
-def calculate_statistics(dataset: list[our_class]) -> dict[int | str, int]:
+def calculate_statistics(dataset: list) -> dict:
     """
     Receives the dataset in the form of a list of Python objects, and calculates the
     statistics necessary.
     """
-    # calculate the total units  sold
-    total_units_sold = sum(item.units_sold for item in dataset)
-    # here we calculate the average profit
-    average_profit = mean(item.total_profit for item in dataset)
-    # calculate the most common country
-    country_frequency = Counter(item.country for item in dataset)
-    most_common_country = country_frequency.most_common(1)[0]
+    # Calculate the number of orders per transit day between 10 to 30
+    transit_days_counter = Counter(
+        (
+            datetime.strptime(item["ship_date"], "%m/%d/%Y")
+            - datetime.strptime(item["order_date"], "%m/%d/%Y")
+        ).days
+        for item in dataset
+        if 10
+        <= (
+            datetime.strptime(item["ship_date"], "%m/%d/%Y")
+            - datetime.strptime(item["order_date"], "%m/%d/%Y")
+        ).days
+        <= 30
+    )
 
     return {
-        "total_units_sold": total_units_sold,
-        "average_profit": average_profit,
-        "most_common_country": most_common_country,
-        "most_common_item_type": most_common_item_type,
+        "orders_per_transit_day": dict(transit_days_counter),
     }
-
-
-# TODO
-pass
 
 
 def prepare_figure(input_figure: str) -> str:

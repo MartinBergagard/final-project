@@ -6,6 +6,7 @@ In the final project, you will need to modify this file to implement your projec
 """
 # built-in imports
 import io
+import pickle
 
 # external imports
 from flask import Blueprint, jsonify, render_template
@@ -28,8 +29,12 @@ bp = Blueprint("bp", __name__, url_prefix="/")
 
 @bp.get("/")  # root route
 def home() -> Response:
-    # TODO: create here the route that renders the home.html file
-    pass
+    # Get the data list
+    data_list = get_data_list()
+    # Calculate the statistics
+    stats = calculate_statistics(data_list)
+    # Render the home.html template with the stats
+    return render_template("home.html", stats=stats)
 
 
 @bp.get("/image")
@@ -50,8 +55,12 @@ def image() -> Response:
 
 @bp.get("/data")  # data route
 def data() -> Response:
-    # TODO: create here the route that renders the data.html file
-    pass
+    # Get the data list
+    data_list = get_data_list()
+    # Convert the list of objects to a list of dictionaries
+    data_dict_list = [item.__dict__ for item in data_list]
+    # Render the data.html template with the data
+    return render_template("data.html", data=data_dict_list)
 
 
 @bp.get("/about")
@@ -64,11 +73,19 @@ def about() -> Response:
 
 @bp.get("/json-dataset")
 def get_json_dataset() -> Response:
-    # TODO
-    pass
+    # Get the data list
+    data_list = get_data_list()
+    # Convert the list of objects to a list of dictionaries
+    data_dict_list = [item.__dict__ for item in data_list]
+    # Return the list as a JSON response
+    return jsonify(data_dict_list)
 
 
 @bp.get("/json-stats")
 def get_json_stats() -> Response:
-    # TODO
-    pass
+    # Get the data list
+    data_list = get_data_list()
+    # Calculate the statistics
+    stats = calculate_statistics(data_list)
+    # Return the statistics as a JSON response
+    return jsonify(stats)

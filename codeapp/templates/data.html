@@ -1,9 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 id="homepage_header">Full data</h1>
-<h2>Full data</h2>
-
-<!-- TODO -->
-<h2>Insert your full data table here!</h2>
+<h1 id="data_header">Final project</h1>
+<h2>Full data from Amazon Prime shows, sorted in order of release year</h2>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>item_type</th>
+            <th>order_priority</th>
+            <th>order_date</th>
+            <th>ship_date</th>
+            <th>units_sold</th>
+            <th>total_profit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in data|sort(attribute='release_year', reverse=True) %}
+        <tr>
+            <td>{{ item.item_type }}</td>
+            <td>{{ item.order_priority }}</td>
+            <td>{{ item.order_date }}</td>
+            <td>{{ item.ship_date }}</td>
+            <td>{{ item.units_sold }}</td>
+            <td>{{ item.total_profit }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
 
 {% endblock content %}
